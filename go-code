@@ -1,0 +1,31 @@
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func Thread1(over1 chan bool, over2 chan bool) {
+	for i := 0; i <= 100; i = i + 2 {
+		fmt.Println("thread-1", i)
+		over1 <- true
+		<-over2
+	}
+}
+
+func Thread2(over1 chan bool, over2 chan bool) {
+	for i := 1; i <= 100; i = i + 2 {
+		<-over1
+		fmt.Println("thread-2", i)
+		over2 <- true
+	}
+
+}
+
+func main() {
+	over1 := make(chan bool)
+	over2 := make(chan bool)
+	go Thread1(over1, over2)
+	go Thread2(over1, over2)
+	time.Sleep(time.Second * 1)
+}
